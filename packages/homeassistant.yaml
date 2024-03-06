@@ -1,0 +1,50 @@
+time:
+  - platform:       homeassistant
+    id:             timeCurrent
+
+#----------------------------------------------------------------------------------------#
+sensor:  
+  - platform:       homeassistant
+    name:           "Outside Temp"
+    id:             outsideTemp
+    entity_id:      ${haOutsideTemp}
+    filters:
+    - round:        0
+  #-----------------------#  
+  - platform:       homeassistant
+    name:           "Outside Feels Like"
+    id:             outsideTempFeelsLike
+    entity_id:      ${haOutsideTempFeelsLike}
+    filters:
+    - round:        0
+  #-----------------------#  
+  - platform:       homeassistant
+    name:           "Outside Humidity"
+    id:             outsideHumidity
+    entity_id:      ${hqOutsideHumidity}
+    filters:
+    - round:        0
+  #-----------------------#  
+  - platform:       homeassistant
+    name:           "Wind Speed"
+    id:             windSpeed
+    entity_id:      ${haWindSpeed}
+    filters:
+    - round:        0
+  #-----------------------#  
+  - platform:       homeassistant
+    name:           "Wind Direction"
+    id:             windDirection
+    entity_id:      ${haWindDirection}
+  #-----------------------#  
+  - platform:       homeassistant
+    name:           "UV Index"
+    id:             uvIndex
+    entity_id:      ${haUVIndex}
+
+#----------------------------------------------------------------------------------------#
+text_sensor:
+  - platform:       homeassistant
+    name:           "Current Conditions"
+    id:             weatherConditions
+    entity_id:      ${haWeatherConditions}

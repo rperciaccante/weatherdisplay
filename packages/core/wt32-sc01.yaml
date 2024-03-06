@@ -1,0 +1,82 @@
+# Useful Resources
+#       https://github.com/krunkel/wt32sc01-with-esphome/tree/main
+#       https://www.tindie.com/products/blacksfactory/wt32-sc01-extension-pcb/
+#       https://community.home-assistant.io/t/wt32-sc01-with-esphome/473531/29
+
+substitutions:
+  subMISO:          GPIO12
+  subMOSI:          GPIO13  
+  subCLK:           GPIO14
+  subCSPin:         GPIO15  # used by display component "cs_pin"
+  subSDA:           GPIO18
+  subSCL:           GPIO19
+  subDCPin:         GPIO21  # used by display component "dc_pin"
+  subResetPin:      GPIO22  # used by display component "reset_pin"
+  subOutput:        GPIO23
+  subInterrupt:     GPIO39
+#   also used
+# display: 
+#   cs_pin:       GPIO15
+#   dc_pin:       
+#   reset_pin:    GPIO22
+
+#----------------------------------------------------------------------------------------#
+esp32:
+  board:            esp-wrover-kit
+  framework:
+    type:           arduino
+
+#----------------------------------------------------------------------------------------#
+logger:
+ level:             DEBUG
+ logs:
+   component:       ERROR
+#----------------------------------------------------------------------------------------#
+i2c:
+  sda:              ${subSDA}
+  scl:              ${subSCL}
+  scan:             false
+#----------------------------------------------------------------------------------------#
+output:
+  - platform:       ledc
+    pin:            ${subOutput}
+    id:             outputBacklight
+   #----------------------------------------------------------------------------------------# 
+light:
+  - platform:       monochromatic
+    name:           "wt32 Back Light"
+    output:         outputBacklight    
+    id:             backlight
+    restore_mode:   ALWAYS_OFF
+#----------------------------------------------------------------------------------------#
+spi:
+  clk_pin:          ${subCLK}
+  mosi_pin:         ${subMOSI}
+  miso_pin:         ${subMISO}
+#----------------------------------------------------------------------------------------#
+# touchscreen:
+#   - platform:       ft63x6
+#     interrupt_pin:  ${subInterrupt}
+#     on_touch:
+#       - logger.log:
+#           format:   Touch %d at (%d, %d)
+#           args:     [touch.id, touch.x, touch.y]
+# #----------------------------------------------------------------------------------------#
+
+#----------------------------------------------------------------------------------------#
+# binary_sensor:
+#   - platform: touchscreen
+#     name: Skip
+#     id: skip_track
+#     internal: True
+#     x_min: 420
+#     x_max: 470
+#     y_min: 280
+#     y_max: 320
+#     filters:
+#       - delayed_on: 30ms
+#     on_press:
+#       - homeassistant.service:
+#           service: media_player.media_next_track
+#           data:
+#             entity_id: media_player.master_bedroom
