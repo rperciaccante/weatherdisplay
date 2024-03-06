@@ -1,0 +1,202 @@
+substitutions:
+  deviceFriendlyName:         'Kitchen Weather Display'
+  deviceName:                 'kitchen-weather-display'
+
+#----------------------------------------------------------------------------------------#
+esphome:
+  name:                       $deviceName
+  friendly_name:              $deviceFriendlyName
+  on_boot:               
+    then:
+      - light.turn_on: 
+          id:                 backlight
+          brightness:         100%
+
+#----------------------------------------------------------------------------------------#
+packages:
+  core:                       !include 
+    file:                     packages/core/wt32-sc01.yaml
+  #-----------------------#
+  fonts:                      !include 
+    file:                     packages/fonts.yaml
+  #-----------------------#
+  network:                    !include 
+    file:                     packages/network.yaml
+    vars: 
+      wifiSSID:               !secret wifi_ssid
+      wifiPassword:           !secret wifi_password
+      netDomain:              !secret domain
+      apHostName:             $deviceFriendlyName
+      apPassword:             !secret ap_password
+      apiKey:                 !secret api_key
+      otaPassword:            !secret ota_password
+  #-----------------------#    
+  haSensors:                  !include
+    file:                     packages/homeassistant.yaml
+    vars: 
+      haOutsideTemp:          sensor.weather_station_temperature
+      haOutsideTempFeelsLike: sensor.weather_station_feels_like
+      hqOutsideHumidity:      sensor.weather_station_humidity
+      haWindSpeed:            sensor.weather_station_wind_speed
+      haWindDirection:        sensor.weather_station_wind_direction_average
+      haUVIndex:              sensor.weather_station_uv_index
+      haWeatherConditions:    weather.home 
+
+#----------------------------------------------------------------------------------------#
+text_sensor:
+  #-----------------------#  
+  - platform:               sun
+    name:                   "Sunrise"
+    type:                   sunrise
+    id:                     sunSunrise
+    format:                 "%I:%M %p"
+  #-----------------------#  
+  - platform:               sun
+    type:                   sunset
+    name:                   "Sunset"
+    id:                     sunSunset
+    format:                 "%I:%M %p"
+
+#----------------------------------------------------------------------------------------#
+sun:
+  latitude:                 !secret latitude
+  longitude:                !secret longitude
+
+#----------------------------------------------------------------------------------------#
+display:
+  - platform:               ili9xxx
+    model:                  ST7796
+    cs_pin:                 GPIO15
+    dc_pin:                 GPIO21
+    reset_pin:              GPIO22
+    rotation:               0
+    pages:
+      - id:                 home
+        lambda: |-
+         // #include <display_320x480.h>
+          std::string iconCurrentConditions =     "";
+          std::string txtCurrentConditions =      "";
+          Color txtColor =                        id(white);
+          // ############################# Standard Page Status Frame #############################
+              it.fill(id(Color::BLACK));
+              it.rectangle(5, 5, 312, 472);       // outside borders
+              it.rectangle(6, 6, 310, 470);       // outside borders
+
+            // ############################# Top Row Contents #############################
+              it.strftime(32, 65, id(timeTop), TextAlign::BOTTOM_LEFT, "%I:%M%p", id(timeCurrent).now());
+              it.strftime(280, 10, id(dateTop), TextAlign::TOP_CENTER, "%b", id(timeCurrent).now());
+              it.strftime(280, 62, id(dateTop), TextAlign::BOTTOM_CENTER, "%d", id(timeCurrent).now());
+
+            // ############################# Top row break #############################
+              it.line(5, 65, 314, 65), id(red);                 // bottom of status bar
+              it.line(7, 66, 314, 66);              // bottom of status bar
+
+            // Main Body
+                
+                if (id(weatherConditions).state == "rainy") {
+                    iconCurrentConditions = "$mdiRainy";
+                    txtCurrentConditions =  "Rainy";
+                    txtColor = id(blue);
+                } else if (id(weatherConditions).state == "cloudy") {
+                    iconCurrentConditions = "$mdiCloudy";
+                    txtCurrentConditions =  "Cloudy";
+                    txtColor = id(blue);
+                } else if (id(weatherConditions).state == "exceptional") {
+                    iconCurrentConditions = "$mdiExceptional";
+                    txtCurrentConditions =  "Exceptional";
+                } else if (id(weatherConditions).state == "fog") {
+                    iconCurrentConditions = "$mdiFog";
+                    txtCurrentConditions =  "Fog";
+                } else if (id(weatherConditions).state == "hail") {
+                    iconCurrentConditions = "$mdiHail";
+                    txtCurrentConditions =  "Hail";
+                } else if (id(weatherConditions).state == "lightning") {
+                    iconCurrentConditions = "$mdiLightning";
+                    txtCurrentConditions =  "Lightning";
+                } else if (id(weatherConditions).state == "lightning-rainy") {
+                    iconCurrentConditions = "$$mdiLightningRainy,";
+                    txtCurrentConditions =  "Lightning/Rain";
+                } else if (id(weatherConditions).state == "partlycloudy") {
+                    iconCurrentConditions = "$mdiPartlyCloudy";
+                    txtCurrentConditions =  "Partly Cloudy";
+                } else if (id(weatherConditions).state == "pouring") {
+                    iconCurrentConditions = "$mdiPouring";
+                    txtCurrentConditions =  "Heavy Rain";
+                } else if (id(weatherConditions).state == "rainy") {
+                    iconCurrentConditions = "$mdiRainy";
+                    txtCurrentConditions =  "Raining";
+                } else if (id(weatherConditions).state == "snowy") {
+                    iconCurrentConditions = "$mdiSnowy";
+                    txtCurrentConditions =  "Snowing";
+                } else if (id(weatherConditions).state == "snowy-rainy") {
+                    iconCurrentConditions = "$mdiSnowyRainy";
+                    txtCurrentConditions =  "Snow/Rain";
+                } else if (id(weatherConditions).state == "sunny") {
+                    iconCurrentConditions = "$mdiSunny";
+                    txtCurrentConditions =  "Sunny";
+                } else if (id(weatherConditions).state == "windy") {
+                    iconCurrentConditions = "$mdiWindy";
+                    txtCurrentConditions =  "Windy";
+                } else if (id(weatherConditions).state == "windy-variant") {
+                    iconCurrentConditions = "$mdiWindyVariant";
+                    txtCurrentConditions =  "Wind/Clouds";
+                }
+                
+                if (!isnan(id(outsideTemp).state)) {
+                    it.printf(120, 85, id(tempMain), TextAlign::TOP_CENTER , "%.0f°", id(outsideTemp).state);
+                    it.printf(267, 92, id(mdi60), id(white), TextAlign::TOP_CENTER, iconCurrentConditions.c_str());
+                }
+                it.print(160, 190, id(condTitle), id(white), TextAlign::TOP_CENTER, txtCurrentConditions.c_str());
+
+                it.printf(160, 275, id(dateTop), TextAlign::BOTTOM_CENTER , "Next Sunrise:  %s", id(sunSunrise).state.c_str());
+                it.printf(160, 303, id(dateTop), TextAlign::BOTTOM_CENTER , "Next Sunset:   %s", id(sunSunset).state.c_str());
+
+                it.line(6, 310, 314, 310);                 // bottom of status bar
+                it.line(6, 311, 314, 311);              // bottom of status bar
+
+                it.line(6, 392, 314, 392);                 // bottom of status bar
+                it.line(6, 393, 314, 393);              // bottom of status bar
+
+                it.line(161, 314, 161, 476);                 // bottom of status bar
+                it.line(162, 314, 162, 476);              // bottom of status bar
+
+            // ################# Upper Left - Humidity
+                it.printf(11, 313, id(label), id(white), TextAlign::TOP_LEFT, "Humidity");
+                if (!isnan(id(outsideHumidity).state)) {
+                    it.printf(85, 393, id(value), id(white), TextAlign::BOTTOM_CENTER, "%.0f%%", id(outsideHumidity).state);
+                } 
+            // ################# Upper Right - Feels Like
+                it.printf(167, 313, id(label), id(white), TextAlign::TOP_LEFT, "Feels Like");
+                if (!isnan(id(outsideTempFeelsLike).state)) {
+                    it.printf(240, 393, id(value), id(white), TextAlign::BOTTOM_CENTER, "%.0f°", id(outsideTempFeelsLike).state);
+                } 
+
+            // ################# Lower Left - Windspeed
+                it.printf(11, 396, id(label), id(white), TextAlign::TOP_LEFT, "Wind");
+                if (!isnan(id(windSpeed).state)) {
+                  if (id(windSpeed).state <= 10) {
+                        txtColor = id(green);
+                    } else if (id(windSpeed).state <= 15) {
+                        txtColor = id(orange);
+                    } else {
+                        txtColor = id(red);
+                    }
+                    it.printf(80, 473, id(value), txtColor, TextAlign::BOTTOM_CENTER, "%.0f", id(windSpeed).state);
+                }
+                it.printf(157, 470, id(label), id(white), TextAlign::BOTTOM_RIGHT, "mph");
+
+            
+            // ################# Lower Right - UV Index
+                it.printf(167, 396, id(label), id(white), TextAlign::TOP_LEFT, "UV Index");
+                if (!isnan(id(uvIndex).state)) {
+                    if (id(uvIndex).state <= 2.5) {
+                        txtColor = id(green);
+                    } else if (id(uvIndex).state <= 7) {
+                        txtColor = id(orange);
+                    } else {
+                        txtColor = id(red);
+                    }
+                    it.printf(240, 473, id(value), txtColor, TextAlign::BOTTOM_CENTER, "%.0f", id(uvIndex).state);
+                }
+                it.printf(157, 470, id(label), id(white), TextAlign::BOTTOM_RIGHT, "mph");
+                

@@ -1,0 +1,125 @@
+substitutions:
+    mdiClearNight:          "\U000F0594"
+    mdiCloudy:              "\U000F0590"
+    mdiExceptional:         "\U000F0599"
+    mdiFog:                 "\U000F0591"
+    mdiHail:                "\U000F0592"
+    mdiLightning:           "\U000F0593"
+    mdiLightningRainy:      "\U000F067E"
+    mdiPartlyCloudy:        "\U000F0595"
+    mdiPouring:             "\U000F0596"
+    mdiRainy:               "\U000F0597"
+    mdiSnowy:               "\U000F0598"
+    mdiSnowyRainy:          "\U000F067F"
+    mdiSunny:               "\U000F05A8"
+    mdiWindy:               "\U000F059D"
+    mdiWindyVariant:        "\U000F059E"
+    mdiHelp:                "\U000F02D6"
+    mdiUVIndex:             "\U000F17FE"
+    
+#----------------------------------------------------------------------------------------#
+color:
+  -  id:            blue
+     hex:           51c0f2         # Create a Home Assistant blue color
+  #-----------------------# 
+  -  id:            grey
+     hex:           A9A9A9
+  #-----------------------# 
+  -  id:            green
+     hex:           00ff00
+  #-----------------------#   
+  -  id:            light_green
+     hex:           bfff00
+  #-----------------------# 
+  -  id:            yellow
+     hex:           ffff00
+  #-----------------------# 
+  -  id:            orange
+     hex:           ff8000
+  #-----------------------#       
+  -  id:            light_red
+     hex:           FF3340
+  #-----------------------# 
+  -  id:            red
+     hex:           ff0000
+  #-----------------------#  
+  -  id:            white
+     hex:           ffffff
+  #-----------------------#     
+  -  id:            black
+     hex:           '000000'
+
+#----------------------------------------------------------------------------------------#
+# MDI icon mapping information: https://pictogrammers.com/library/mdi/
+font:
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      900
+     id:            timeTop
+     size:          48
+  #-----------------------#
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      700
+     id:            dateTop
+     size:          24
+  #-----------------------#      
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      700
+     id:             label
+     size:           18
+  #-----------------------#
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      500
+     id:            value
+     size:          52
+  #-----------------------#
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      900
+     id:            tempMain
+     size:          96
+  #-----------------------#
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      900
+     id:            condTitle
+     size:          38
+  #-----------------------#
+  -  file:
+       type:        gfonts
+       family:      Roboto
+       weight:      900
+     id:            tempTitle
+     size:          36
+  #-----------------------#
+  -  file:          "fonts/materialdesignicons-webfont.ttf"
+     id:            mdi60
+     size:          96
+     glyphs:    [
+                    $mdiClearNight,
+                    $mdiCloudy,
+                    $mdiExceptional,
+                    $mdiFog,
+                    $mdiHail,
+                    $mdiLightning,
+                    $mdiLightningRainy,
+                    $mdiPartlyCloudy,
+                    $mdiPouring,
+                    $mdiRainy,
+                    $mdiSnowy,
+                    $mdiSnowyRainy,
+                    $mdiSunny,
+                    $mdiWindy,
+                    $mdiWindyVariant,
+                    $mdiHelp,
+                    mdiUVIndex
+                ]   

@@ -1,0 +1,109 @@
+
+esphome:
+    on_boot:               
+        - priority:                 -100
+          then:
+            - lambda: |-
+                id(wifiConnected).publish_state(false);
+                id(apiConnected).publish_state(false);
+
+#----------------------------------------------------------------------------------------#
+globals:
+    -   id:                 apiConnected
+        type:               bool
+        restore_value:      no
+        initial_value:      'false'
+
+    -   id:                 wifiConnected
+        type:               bool
+        restore_value:      no
+        initial_value:      'false'
+    
+#----------------------------------------------------------------------------------------#
+wifi:
+  networks:
+    - ssid:                 ${wifiSSID}                    
+      password:             ${wifiPassword}
+  ap:
+    ssid:                   "${apHostName} Hotspot"
+    password:               ${apPassword}
+  domain:                   ${netDomain}
+  on_connect:
+    then:
+      - lambda: |-
+          id(wifiConnected) = true;
+  on_disconnect:
+    then:
+      - lambda: |-
+            id(wifiConnected) = false;
+
+#----------------------------------------------------------------------------------------#
+api:
+  encryption:
+    key:                    ${apiKey}
+  on_client_connected:
+    - logger.log:
+        format:             "Client %s connected to API with IP %s"
+        args:               ["client_info.c_str()", "client_address.c_str()"] 
+    - lambda:               "id(apiConnected) = true;"
+  on_client_disconnected:
+      - lambda:             "id(apiConnected) = false;"
+
+#----------------------------------------------------------------------------------------#
+ota:
+  password:                 ${otaPassword}
+
+#----------------------------------------------------------------------------------------#
+captive_portal:
+
+#----------------------------------------------------------------------------------------#
+web_server: 
+    port:                   80
+
+#----------------------------------------------------------------------------------------#
+
+text_sensor:
+    - platform:             wifi_info             
+      ip_address:
+        name:               "Device: IP Address"
+        id:                 host_ip
+        entity_category:    diagnostic
+        icon:               mdi:fingerprint
+      ssid:
+        name:               "Device: WiFi SSID"
+        id:                 host_ssid
+        entity_category:    diagnostic
+        icon:               mdi:router-wireless
+      mac_address:
+        id:                 host_mac
+        name:               "Device: MAC Address"
+        entity_category:    diagnostic
+        icon:               mdi:fingerprint
+ 
+    - platform:             template
+      name:                 "Device: Name"
+      id:                   host_name
+      lambda: |-
+                            return {App.get_friendly_name().c_str()};
+      update_interval:      60s
+
+    - platform:             template
+      name:                 mDNS Name
+      id:                   hostmDNSName
+      lambda: |-
+                            return {App.get_name()};
+      filters:
+        - to_lower:
+        - append:           ".local"
+        - substitute:
+          -                 "_ -> - "
+
+sensor:
+  - platform:               wifi_signal
+    name:                   "Device: WiFi Signal Percent"
+    filters:
+      - lambda:             return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement:    "%"
+    id:                     wifiSignalPct
+    update_interval:        60s
+    entity_category:        "diagnostic"
