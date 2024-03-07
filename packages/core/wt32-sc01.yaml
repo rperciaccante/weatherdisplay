@@ -44,10 +44,10 @@ output:
    #----------------------------------------------------------------------------------------# 
 light:
   - platform:       monochromatic
-    name:           "wt32 Back Light"
+    name:           "Display Back Light"
     output:         outputBacklight    
     id:             backlight
-    restore_mode:   ALWAYS_OFF
+    restore_mode:   ALWAYS_ON
 #----------------------------------------------------------------------------------------#
 spi:
   clk_pin:          ${subCLK}

@@ -1,32 +1,34 @@
 
 esphome:
-    on_boot:               
-        - priority:                 -100
-          then:
-            - lambda: |-
-                id(wifiConnected).publish_state(false);
-                id(apiConnected).publish_state(false);
+  on_boot:               
+    - priority:                 -100
+      then:
+          - lambda: |-
+              id(wifiConnected).publish_state(false);
+              id(apiConnected).publish_state(false);
 
 #----------------------------------------------------------------------------------------#
 globals:
-    -   id:                 apiConnected
-        type:               bool
-        restore_value:      no
-        initial_value:      'false'
-
-    -   id:                 wifiConnected
-        type:               bool
-        restore_value:      no
-        initial_value:      'false'
+  -  id:                 apiConnected
+     type:               bool
+     restore_value:      no
+     initial_value:      'false'
+  #-----------------------#
+  -  id:                 wifiConnected
+     type:               bool
+     restore_value:      no
+     initial_value:      'false'
     
 #----------------------------------------------------------------------------------------#
 wifi:
   networks:
     - ssid:                 ${wifiSSID}                    
       password:             ${wifiPassword}
+  #-----------------------#
   ap:
     ssid:                   "${apHostName} Hotspot"
     password:               ${apPassword}
+  #-----------------------#
   domain:                   ${netDomain}
   on_connect:
     then:
@@ -61,43 +63,48 @@ web_server:
     port:                   80
 
 #----------------------------------------------------------------------------------------#
-
 text_sensor:
-    - platform:             wifi_info             
-      ip_address:
-        name:               "Device: IP Address"
-        id:                 host_ip
-        entity_category:    diagnostic
-        icon:               mdi:fingerprint
-      ssid:
-        name:               "Device: WiFi SSID"
-        id:                 host_ssid
-        entity_category:    diagnostic
-        icon:               mdi:router-wireless
-      mac_address:
-        id:                 host_mac
-        name:               "Device: MAC Address"
-        entity_category:    diagnostic
-        icon:               mdi:fingerprint
- 
-    - platform:             template
-      name:                 "Device: Name"
-      id:                   host_name
-      lambda: |-
-                            return {App.get_friendly_name().c_str()};
-      update_interval:      60s
+  - platform:             wifi_info             
+    ip_address:
+      name:               "Device: IP Address"
+      id:                 host_ip
+      entity_category:    diagnostic
+      icon:               mdi:fingerprint
+    ssid:
+      name:               "Device: WiFi SSID"
+      id:                 host_ssid
+      entity_category:    diagnostic
+      icon:               mdi:router-wireless
+    mac_address:
+      id:                 host_mac
+      name:               "Device: MAC Address"
+      entity_category:    diagnostic
+      icon:               mdi:fingerprint
+  #-----------------------#
+  - platform:             template
+    name:                 "Device: Name"
+    id:                   host_name
+    internal:             true
+    lambda: |-
+                          return {App.get_friendly_name().c_str()};
+    update_interval:      60s
+  #-----------------------#
+  - platform:             template
+    name:                 mDNS Name
+    id:                   hostmDNSName
+    entity_category:      diagnostic
+    lambda: |-
+                          return {App.get_name()};
+    filters:
+      - to_lower:
+      - append:           !secret domain
+      - substitute:
+        -                 "_ -> - "
+  #-----------------------# 
+  -  platform: version
+     name: "ESPHome Version"
 
-    - platform:             template
-      name:                 mDNS Name
-      id:                   hostmDNSName
-      lambda: |-
-                            return {App.get_name()};
-      filters:
-        - to_lower:
-        - append:           ".local"
-        - substitute:
-          -                 "_ -> - "
-
+#----------------------------------------------------------------------------------------#
 sensor:
   - platform:               wifi_signal
     name:                   "Device: WiFi Signal Percent"

@@ -49,12 +49,14 @@ text_sensor:
     name:                   "Sunrise"
     type:                   sunrise
     id:                     sunSunrise
+    internal:               true
     format:                 "%I:%M %p"
   #-----------------------#  
   - platform:               sun
     type:                   sunset
     name:                   "Sunset"
     id:                     sunSunset
+    internal:               true
     format:                 "%I:%M %p"
 
 #----------------------------------------------------------------------------------------#
@@ -73,7 +75,6 @@ display:
     pages:
       - id:                 home 
         lambda: |-
-         // #include <display_320x480.h>
           std::string iconCurrentConditions =     "";
           std::string txtCurrentConditions =      "";
           Color txtColor =                        id(white);
