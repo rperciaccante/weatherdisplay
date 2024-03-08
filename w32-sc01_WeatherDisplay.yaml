@@ -102,6 +102,10 @@ display:
                     iconCurrentConditions = "$mdiCloudy";
                     txtCurrentConditions =  "Cloudy";
                     txtColor = id(blue);
+                } else if (id(weatherConditions).state == "clear-night") {
+                    iconCurrentConditions = "$mdiClearNight";
+                    txtCurrentConditions =  "Clear";
+                    txtColor = id(blue);
                 } else if (id(weatherConditions).state == "exceptional") {
                     iconCurrentConditions = "$mdiExceptional";
                     txtCurrentConditions =  "Exceptional";
@@ -123,9 +127,6 @@ display:
                 } else if (id(weatherConditions).state == "pouring") {
                     iconCurrentConditions = "$mdiPouring";
                     txtCurrentConditions =  "Heavy Rain";
-                } else if (id(weatherConditions).state == "rainy") {
-                    iconCurrentConditions = "$mdiRainy";
-                    txtCurrentConditions =  "Raining";
                 } else if (id(weatherConditions).state == "snowy") {
                     iconCurrentConditions = "$mdiSnowy";
                     txtCurrentConditions =  "Snowing";
